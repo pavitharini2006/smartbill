@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART MART - Supermarket Billing System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-logo">🛒</div>
+
+        <div>
+            <h1>SMART MART</h1>
+            <p>Supermarket & Daily Essentials</p>
+        </div>
+    </div>
+
+    <div class="top-actions">
+        <span id="liveDateTime"></span>
+
+        <button class="header-btn" onclick="newBill()">
+            ＋ New Bill
+        </button>
+    </div>
+
+</header>
+
+
+<!-- ================= MAIN LAYOUT ================= -->
+<div class="app-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+
+        <nav>
+
+            <button class="nav-item active" data-page="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="nav-item" data-page="products">
+                <span>🛍️</span>
+                <span>Products</span>
+            </button>
+
+            <button class="nav-item" data-page="billing">
+                <span>🧾</span>
+                <span>Billing / POS</span>
+                <b id="navCartCount">0</b>
+            </button>
+
+            <button class="nav-item" data-page="history">
+                <span>📚</span>
+                <span>Bill History</span>
+            </button>
+
+            <button class="nav-item" data-page="settings">
+                <span>⚙️</span>
+                <span>Settings</span>
+            </button>
+
+        </nav>
+
+        <div class="cashier-box">
+            <div class="cashier-avatar">C</div>
+
+            <div>
+                <strong>Cashier</strong>
+                <small>SMART MART POS</small>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- ================= CONTENT ================= -->
+    <main class="main-content">
+
+
+        <!-- ================= DASHBOARD ================= -->
+        <section class="page active" id="page-dashboard">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Dashboard</h2>
+                    <p>Welcome to your supermarket billing system.</p>
+                </div>
+
+                <button class="primary-btn" onclick="newBill()">
+                    ＋ Start New Bill
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div>
+                        <span>Today's Sales</span>
+                        <strong id="statSales">₹0.00</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🧾</div>
+                    <div>
+                        <span>Bills Generated</span>
+                        <strong id="statBills">0</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div>
+                        <span>Total Products</span>
+                        <strong id="statProducts">56</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🛒</div>
+                    <div>
+                        <span>Cart Items</span>
+                        <strong id="statCart">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+
+                    <div class="quick-actions">
+
+                        <button onclick="goToPage('billing')">
+                            🧾
+                            <span>Create Bill</span>
+                        </button>
+
+                        <button onclick="goToPage('products')">
+                            🛍️
+                            <span>Browse Products</span>
+                        </button>
+
+                        <button onclick="goToPage('history')">
+                            📚
+                            <span>Sales History</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Low Stock</h3>
+
+                        <button class="text-btn" onclick="goToPage('products')">
+                            View Products
+                        </button>
+                    </div>
+
+                    <div id="lowStockList"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h3>Recent Bills</h3>
+
+                    <button class="text-btn" onclick="goToPage('history')">
+                        View All
+                    </button>
+                </div>
+
+                <div id="recentBills"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PRODUCTS ================= -->
+        <section class="page" id="page-products">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Products</h2>
+                    <p>Search products and add them to the current bill.</p>
+                </div>
+
+                <button class="primary-btn" onclick="goToPage('billing')">
+                    🧾 Open Billing
+                </button>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+                    🔎
+                    <input
+                        id="productSearch"
+                        type="search"
+                        placeholder="Search by product name or ID..."
+                    >
+                </div>
+
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                </select>
+
+                <select id="sortProducts">
+
+                    <option value="name">
+                        Name A-Z
+                    </option>
+
+                    <option value="priceLow">
+                        Price: Low to High
+                    </option>
+
+                    <option value="priceHigh">
+                        Price: High to Low
+                    </option>
+
+                    <option value="stockLow">
+                        Stock: Low to High
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div id="productGrid" class="product-grid"></div>
+
+        </section>
+
+
+        <!-- ================= BILLING ================= -->
+        <section class="page" id="page-billing">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Billing / POS</h2>
+                    <p>Create and complete a customer bill.</p>
+                </div>
+
+                <button class="secondary-btn" onclick="clearCart()">
+                    🗑 Clear Cart
+                </button>
+
+            </div>
+
+
+            <div class="billing-layout">
+
+                <!-- LEFT -->
+                <div class="billing-left">
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+                            <h3>Customer Details</h3>
+                            <span class="optional">Optional</span>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <label>
+                                Customer Name
+                                <input
+                                    id="customerName"
+                                    type="text"
+                                    placeholder="Enter customer name"
+                                >
+                            </label>
+
+                            <label>
+                                Mobile Number
+                                <input
+                                    id="customerMobile"
+                                    type="tel"
+                                    maxlength="10"
+                                    placeholder="10-digit mobile number"
+                                >
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+
+                            <h3>Shopping Cart</h3>
+
+                            <span id="cartItemLabel">
+                                0 items
+                            </span>
+
+                        </div>
+
+                        <div id="cartContainer"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT -->
+                <div class="billing-right">
+
+                    <div class="panel summary-panel">
+
+                        <div class="panel-header">
+
+                            <h3>Bill Summary</h3>
+
+                            <span id="billNumberPreview">
+                                New Bill
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <strong id="subtotal">₹0.00</strong>
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Discount</span>
+
+                            <div class="discount-input">
+                                <span>₹</span>
+
+                                <input
+                                    id="discountInput"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value="0"
+                                >
+                            </div>
+
+                        </div>
+
+
+                        <div class="summary-row">
+                            <span>GST / Tax</span>
+                            <strong id="gstAmount">₹0.00</strong>
+                        </div>
+
+
+                        <div class="summary-row total-row">
+                            <span>Grand Total</span>
+                            <strong id="grandTotal">₹0.00</strong>
+                        </div>
+
+
+                        <!-- PAYMENT -->
+                        <div class="payment-section">
+
+                            <h3>Payment Method</h3>
+
+                            <div class="payment-methods">
+
+                                <button
+                                    class="payment-btn active"
+                                    data-payment="Cash"
+                                >
+                                    💵 Cash
+                                </button>
+
+                                <button
+                                    class="payment-btn"
+                                    data-payment="UPI"
+                                >
+                                    📱 UPI
+                                </button>
+
+                                <button
+                                    class="payment-btn"
+                                    data-payment="Debit Card"
+                                >
+                                    💳 Debit Card
+                                </button>
+
+                                <button
+                                    class="payment-btn"
+                                    data-payment="Credit Card"
+                                >
+                                    💳 Credit Card
+                                </button>
+
+                            </div>
+
+
+                            <div id="cashBox" class="cash-box">
+
+                                <label>
+                                    Cash Received
+
+                                    <input
+                                        id="cashReceived"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        placeholder="Enter amount received"
+                                    >
+                                </label>
+
+                                <div class="change-row">
+
+                                    <span>Change</span>
+
+                                    <strong id="changeAmount">
+                                        ₹0.00
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                class="complete-btn"
+                                onclick="completePayment()"
+                            >
+                                ✓ COMPLETE PAYMENT
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= HISTORY ================= -->
+        <section class="page" id="page-history">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Bill History</h2>
+                    <p>View completed sales and reprint invoices.</p>
+                </div>
+
+                <div class="history-total">
+                    Total Sales:
+                    <strong id="historyTotal">₹0.00</strong>
+                </div>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+                    🔎
+
+                    <input
+                        id="billSearch"
+                        type="search"
+                        placeholder="Search bill number or customer..."
+                    >
+                </div>
+
+                <input
+                    id="billDateFilter"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="panel">
+                <div id="historyTable"></div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= SETTINGS ================= -->
+        <section class="page" id="page-settings">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Settings</h2>
+                    <p>Configure your supermarket information.</p>
+                </div>
+
+            </div>
+
+
+            <div class="settings-card">
+
+                <label>
+                    Store Name
+                    <input id="storeNameSetting">
+                </label>
+
+                <label>
+                    Address
+                    <input id="storeAddressSetting">
+                </label>
+
+                <label>
+                    Phone
+                    <input id="storePhoneSetting">
+                </label>
+
+                <div class="settings-buttons">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveSettings()"
+                    >
+                        Save Settings
+                    </button>
+
+                    <button
+                        class="danger-btn"
+                        onclick="resetData()"
+                    >
+                        Reset Demo Data
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= INVOICE MODAL ================= -->
+<div id="invoiceModal" class="modal hidden">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h2>Invoice</h2>
+
+            <button
+                class="close-btn"
+                onclick="closeInvoice()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="invoiceContent"></div>
+
+        <div class="modal-actions">
+
+            <button
+                class="secondary-btn"
+                onclick="printInvoice()"
+            >
+                🖨 Print
+            </button>
+
+            <button
+                class="secondary-btn"
+                onclick="downloadInvoice()"
+            >
+                ⬇ Download Invoice
+            </button>
+
+            <button
+                class="primary-btn"
+                onclick="newBillFromInvoice()"
+            >
+                ＋ New Bill
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
